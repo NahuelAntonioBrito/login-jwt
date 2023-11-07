@@ -1,38 +1,21 @@
 import { Router } from "express";
 import passport from "passport";
-import { JWT_COOKIE_NAME } from "../utils.js";
+import { registerController, failRegisterController, loginController, failLoginController, logoutController, githubController, githubCallBackController } from "../controllers/session.controller.js";
 const router = Router()
 
-router.post('/register', passport.authenticate('register', {failureRedirect: '/session/failRegister'}), async(req, res) => {
-    res.redirect('/')
-})
+router.post('/register', passport.authenticate('register', {failureRedirect: '/session/failRegister'}), registerController)
 
-router.get('/failRegister', (req, res) => res.send({ error: 'Passport register Failed'}))
+router.get('/failRegister', failRegisterController)
 
-router.post('/login', passport.authenticate('login', {failureRedirect: '/session/failLogin'}), async(req, res) => {
-    if(!req.user){
-        return res.status(400).send({ status:'error', error:'Invalid credentials'})
-    }
+router.post('/login', passport.authenticate('login', {failureRedirect: '/session/failLogin'}), loginController)
 
-    res.cookie(JWT_COOKIE_NAME, req.user.token).redirect('/products');
+router.get('/failLogin', failLoginController)
 
-})
+router.get('/logout', logoutController);
 
-router.get('/failLogin', (req, res) => res.send({ error: 'Passport login Failed'}))
 
-router.get('/logout', (req, res) => {
-    req.clearCookie(JWT_COOKIE_NAME).res.redirect('/')
+router.get('/github', passport.authenticate('github', { scope: ['user: email']}), githubController)
 
-})
-
-router.get('/github', passport.authenticate('github', { scope: ['user: email']}), (reqe, res) => {
-
-})
-
-router.get('/githubcallback', passport.authenticate('github' , { failureRedirect: '/login'}), async( req, res) => {
-    console.log('Callback: ', req.user )
-    req.session.user = req.user
-    res.redirect('/products')
-})
+router.get('/githubcallback', passport.authenticate('github' , { failureRedirect: '/login'}), githubCallBackController)
 
 export default router

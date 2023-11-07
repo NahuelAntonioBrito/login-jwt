@@ -1,9 +1,9 @@
 <div>
 
-    <h1>Bienvenido, {{user.firstName}} {{user.lastName}}</h1>
+    <h1>Bienvenido, {{getPrototypeProperty user "firstName"}} {{getPrototypeProperty user "lastName"}}</h1>
 
     <section>
-        <a href="/profile">{{user.email}}</a>
+        <a href="/profile">{{getPrototypeProperty user "email"}}</a>
         <a href="/api/sessions/logout">LOGOUT</a>
     </section>
 
